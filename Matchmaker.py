@@ -102,3 +102,5 @@ time3 = time.time()
 # print(qsort(players))
 
 # print("--- %s seconds ---" % (time.time() - newStart))
+
+#test
