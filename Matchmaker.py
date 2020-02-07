@@ -66,7 +66,7 @@ class Player:
     # it is currently set to display the player's MMR followed by the roles they play.
 
     def __repr__(self):
-        return str(self.MMR)  # + " " + str(self.roles)
+        return str(self.MMR) + " " + str(self.roles)
 
     def getMMR(self):
         return int(self.MMR)
@@ -94,29 +94,31 @@ class Game:
 
 
 def CreateMatch(MMRRange):
+    matchPlayers = []
     radiant = []
     dire = []
-    basePlayer = players[0].getMMR()
-    radiant.append(players[0])
-    del players[0]
+    if len(players) > 0:
+        basePlayer = players[0].getMMR()
+        matchPlayers.append(players[0])
+        del players[0]
     for num, player in enumerate(players):
         if abs(basePlayer - player.MMR) < MMRRange:
-            radiant.append(player)
+            matchPlayers.append(player)
             del players[num]
-            if len(radiant) == 5:
+            if len(matchPlayers) == 10:
                 break
-    for num, player in enumerate(players):
-        if abs(basePlayer - player.MMR) < MMRRange:
-            dire.append(player)
-            del players[num]
-            if len(dire) == 5:
-                break
-    if len(radiant) + len(dire) != 10:
-        players.extend(radiant)
-        players.extend(dire)
+    matchPlayers.sort()
+    if len(matchPlayers) < 10:
+        players.extend(matchPlayers)
         random.shuffle(players)
         return 1
-    else:
+    if len(matchPlayers) == 10:
+        for i in range(0, 10, 2):
+            radiant.append(matchPlayers[i])
+        for i in range(1, 11, 2):
+            dire.append(matchPlayers[i])
+
+    if len(radiant) == 5 and len(dire) == 5:
         return str(radiant) + ' vs. ' + str(dire)
 
 
@@ -124,13 +126,15 @@ def main():
     matches = []
     for i in range(playerbase):
         players.append(Player())
-    print("Created playerbase")
-    for MMRAttempt in range(300):
-        for i in range(100):
-            matches.append(CreateMatch(MMRAttempt))
+    print("Created playerbase\nForming Matches\n")
+    for i in range(10000):
+        matches.append(CreateMatch(10))
+
     matches2 = [x for x in matches if isinstance(x, str)]
-    print(matches2)
-    print("Reject Players")
+    print(10 * len(matches2))
+    for i in matches2:
+        print(i)
+    print("\nReject Players\n\n" + str(len(players)))
     print(sorted(players))
 
 
