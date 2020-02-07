@@ -93,7 +93,7 @@ class Game:
 # Once the match is created, it deletes them from the list of queueing players
 
 
-def CreateMatch(MMRRange):
+def CreateMatch(mmrFunction):
     matchPlayers = []
     radiant = []
     dire = []
@@ -102,7 +102,7 @@ def CreateMatch(MMRRange):
         matchPlayers.append(players[0])
         del players[0]
     for num, player in enumerate(players):
-        if abs(basePlayer - player.MMR) < MMRRange:
+        if abs(basePlayer - player.MMR) < mmrFunction:
             matchPlayers.append(player)
             del players[num]
             if len(matchPlayers) == 10:
@@ -111,7 +111,6 @@ def CreateMatch(MMRRange):
     if len(matchPlayers) < 10:
         players.extend(matchPlayers)
         random.shuffle(players)
-        return 1
     if len(matchPlayers) == 10:
         for i in range(0, 10, 2):
             radiant.append(matchPlayers[i])
@@ -127,8 +126,10 @@ def main():
     for i in range(playerbase):
         players.append(Player())
     print("Created playerbase\nForming Matches\n")
+    
     for i in range(10000):
-        matches.append(CreateMatch(10))
+        mmrFunction = ( 10 / ( len(players) / playerbase ) )
+        matches.append(CreateMatch(mmrFunction))
 
     matches2 = [x for x in matches if isinstance(x, str)]
     print(10 * len(matches2))
@@ -136,6 +137,8 @@ def main():
         print(i)
     print("\nReject Players\n\n" + str(len(players)))
     print(sorted(players))
+
+    print(mmrFunction)
 
 
 main()
