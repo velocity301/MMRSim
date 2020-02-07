@@ -70,6 +70,9 @@ class Player:
 
     def getMMR(self):
         return int(self.MMR)
+
+    def getRoles(self):
+        return self.roles
     '''
     other things to consider adding to the Player Class:
         -having MMR and actual skill be different values so we can have win probabilities of smurfs
@@ -130,6 +133,7 @@ def main():
     for i in range(10000):
         mmrFunction = ( 10 / ( len(players) / playerbase ) )
         matches.append(CreateMatch(mmrFunction))
+
 
     matches2 = [x for x in matches if isinstance(x, str)]
     print(10 * len(matches2))
