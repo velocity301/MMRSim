@@ -4,12 +4,11 @@ End goal is to be able to simulate the effects of game length, playerbase size,
 smurfing, and other factors on matchmaking both on the average player and either
 end of the skill spectrum.
 '''
-import time
 import random
+import time
 # Using numbers higher than a million will make it take quite a while
 playerbase = 1000
 players = []
-
 start_time = time.time()
 
 
@@ -67,8 +66,10 @@ class Player:
     # it is currently set to display the player's MMR followed by the roles they play.
 
     def __repr__(self):
-        return str(self.MMR) + " " + str(self.roles)
+        return str(self.MMR)  # + " " + str(self.roles)
 
+    def getMMR(self):
+        return int(self.MMR)
     '''
     other things to consider adding to the Player Class:
         -having MMR and actual skill be different values so we can have win probabilities of smurfs
@@ -76,31 +77,61 @@ class Player:
     '''
 
 
-# def qsort(inlist):
-#     if inlist == []:
-#         return []
-#     else:
-#         pivot = inlist[0]
-#         lesser = qsort([x for x in inlist[1:] if x < pivot])
-#         greater = qsort([x for x in inlist[1:] if x >= pivot])
-#         return lesser + [pivot] + greater
+class Game:
+    def __init__(self, radiant, dire):
+        self.radiant = radiant
+        self.dire = dire
+        # number of seconds in the game. Useful for later when we simulate people logging in and out.
+        # currently set to about 36:40 with a standard deviation of 18:20
+        self.duration = round(random.gauss(2200, 1100))
+
+    def __repr__(radiant, dire):
+        return str(self.radiant) + ' vs. ' + str(self.dire)
+# This is going to iterate through all queueing players and create a 5v5 match.
+# First iteration just grabs a player at the start of the list and finds 9 people within 100 MMR
+# Roles are not yet implemented
+# Once the match is created, it deletes them from the list of queueing players
 
 
-# player generation
-for i in range(playerbase):
-    players.append(Player())
-time1 = time.time()
+def CreateMatch(MMRRange):
+    radiant = []
+    dire = []
+    basePlayer = players[0].getMMR()
+    radiant.append(players[0])
+    del players[0]
+    for num, player in enumerate(players):
+        if abs(basePlayer - player.MMR) < MMRRange:
+            radiant.append(player)
+            del players[num]
+            if len(radiant) == 5:
+                break
+    for num, player in enumerate(players):
+        if abs(basePlayer - player.MMR) < MMRRange:
+            dire.append(player)
+            del players[num]
+            if len(dire) == 5:
+                break
+    if len(radiant) + len(dire) != 10:
+        players.extend(radiant)
+        players.extend(dire)
+        random.shuffle(players)
+        return 1
+    else:
+        return str(radiant) + ' vs. ' + str(dire)
 
-time2 = time.time()
-players.sort()
-print(players)
-print("--- %s seconds ---" % (time1 - start_time))
-print("--- %s seconds ---" % (time.time() - time2))
-time3 = time.time()
-# newStart = time.time() - start_time
 
-# print(qsort(players))
+def main():
+    matches = []
+    for i in range(playerbase):
+        players.append(Player())
+    print("Created playerbase")
+    for MMRAttempt in range(300):
+        for i in range(100):
+            matches.append(CreateMatch(MMRAttempt))
+    matches2 = [x for x in matches if isinstance(x, str)]
+    print(matches2)
+    print("Reject Players")
+    print(sorted(players))
 
-# print("--- %s seconds ---" % (time.time() - newStart))
 
-#test
+main()
