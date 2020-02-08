@@ -96,21 +96,40 @@ class Game:
 # Once the match is created, it deletes them from the list of queueing players
 
 
+def FindPlayerWithRole(players, MMR, mmrFunction, role):
+    for num, player in enumerate(players):
+        if role in player.roles and abs(MMR - player.getMMR()) < 100:
+            outputPlayer = player
+            del players[num]
+            return outputPlayer
+
+
 def CreateMatch(mmrFunction):
     matchPlayers = []
     radiant = []
     dire = []
-    if len(players) > 0:
-        basePlayer = players[0].getMMR()
-        matchPlayers.append(players[0])
-        del players[0]
-    for num, player in enumerate(players):
-        if abs(basePlayer - player.MMR) < mmrFunction:
-            matchPlayers.append(player)
-            del players[num]
-            if len(matchPlayers) == 10:
-                break
-    matchPlayers.sort()
+    basePlayer = round(random.gauss(2200, 1100))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 5))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 5))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 4))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 4))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 3))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 3))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 1))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 1))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 2))
+    matchPlayers.append(FindPlayerWithRole(
+        players, basePlayer, mmrFunction, 2))
+
     if len(matchPlayers) < 10:
         players.extend(matchPlayers)
         random.shuffle(players)
@@ -129,13 +148,15 @@ def main():
     for i in range(playerbase):
         players.append(Player())
     print("Created playerbase\nForming Matches\n")
-    
+
     for i in range(10000):
-        mmrFunction = ( 10 / ( len(players) / playerbase ) )
-        matches.append(CreateMatch(mmrFunction))
+        mmrFunction = 10000
+        m1 = CreateMatch(mmrFunction)
+        matches.append(m1)
+        if "None" not in m1:
+            print(m1)
 
-
-    matches2 = [x for x in matches if isinstance(x, str)]
+    matches2 = [x for x in matches if "None" not in x]
     print(10 * len(matches2))
     for i in matches2:
         print(i)
